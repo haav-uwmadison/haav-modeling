@@ -1,5 +1,7 @@
 # Hydrostatics
 
+- [v6 setup](v6-2026-11-11/README.md): reuses the v5 loading, solve and report workflow; completed 153.595 lb partial-loading run with the supplied v6 geometry; blank weights excluded as authorized.
+
 - [v5 NavalToolbox notebook](v5-2026-11-05/navaltoolbox.ipynb): new STEP and supplied component loading; blank weights intentionally excluded as requested. [Results and assumptions](v5-2026-11-05/README.md).
 - [v4 NavalToolbox notebook](v4-2026-10-30/navaltoolbox.ipynb): actual hull geometry, weight sweeps, draft, freeboard and wetted area. [Current validation status](v4-2026-10-30/VALIDATION.md).
 - [v4 quick displacement calculator](v4-2026-10-30/displacement-calculator.ipynb): mass ÷ density, with no hull-shape solve.
@@ -11,7 +13,9 @@ From the repository root:
 sh hull/hydrostatics/setup.sh
 ```
 
-This installs NavalToolbox 0.9.3 in `hull/hydrostatics/.venv`, checks an analytical box, then runs the v4 weight sweep. Successful output goes to `v4-2026-10-30/results/navaltoolbox/`: `REPORT.md`, `hydrostatics.csv`, `study.json`, and `hydrostatics.png`. Existing results are never overwritten; pass `--output NEW_FOLDER` for another run.
+Use `sh hull/hydrostatics/setup.sh --install-only` to install dependencies for v6 without running the v4 sweep.
+
+The default command installs NavalToolbox 0.9.3 in `hull/hydrostatics/.venv`, checks an analytical box, then runs the v4 weight sweep. Successful output goes to `v4-2026-10-30/results/navaltoolbox/`: `REPORT.md`, `hydrostatics.csv`, `study.json`, and `hydrostatics.png`. Existing results are never overwritten; pass `--output NEW_FOLDER` for another run.
 
 Use your existing Python 3.13 kernel; the v4 notebook loads the local `.venv` packages in its setup cell. The `.venv` interpreter is also supported. Rebuilding the checked-in geometry requires `requirements-geometry.txt` and `python hull/hydrostatics/v4-2026-10-30/prepare_geometry.py`.
 

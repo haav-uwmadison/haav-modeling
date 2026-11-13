@@ -4,6 +4,37 @@ See [`VERSIONING.md`](VERSIONING.md) for how this file and `VERSION` are kept. T
 of [`MarMar888/hav`](https://github.com/MarMar888/hav)'s `optimization/` folder with its full history
 (MarMar888/hav#98) and keeps the same version line.
 
+## 0.7.5 — 2026-11-11
+
+Added a November 11 v6 Savitsky sensitivity notebook reusing the existing engine,
+sensitivity calculations and inch-based charts, with direct references to the v6
+hydrostatics STEP and component loading. Exact CAD-edge measurements and a transom
+drawing support the user-confirmed 72-inch length, 16-inch outer chine beam and
+15-degree main-panel deadrise. The user specified an 11-degree shaft/thrust angle,
+retaining two propellers and the previous thrust-line reference point.
+
+Ran 26 cases across 0–30 mph and saved the executed notebook, plots, curves and
+sensitivities. Included the 12.608842-degree outer-chine-chord approximation as a
+separate comparison. Geometry and loading hashes prevent stale source reuse;
+partial loading, reverse-chine/rocker limitations and empirical-screen flags remain
+explicit. Historical notebooks, user edits and equation definitions are preserved.
+
+## 0.7.4 — 2026-11-11
+
+Added a v6 hydrostatics notebook, geometry inspection and reviewed flotation mesh
+for the supplied November 11 STEP. Rebuilt the invalid rim face as a fresh cap over
+the valid exterior faces. Extracted the v5 component-loading solve, analytical-box,
+buoyancy/CG checks and timestamped reports into a reusable runner, preserving
+historical notebooks and results. Added an install-only environment setup option.
+
+Ran the supplied v6 loading: seven filled rows totaling 153.595 lb, with thirteen
+blank weights excluded as authorized. Saved the executed notebook, input snapshot,
+excluded rows and results: midship draft 5.19 in, minimum rim freeboard 5.56 in and
+initial transverse GM 3.74 in. Analytical-box, buoyancy-balance and loading-CG
+checks passed; results describe the supplied partial loading. Added a simple
+notebook side view with horizontal water and the hull at the calculated trim,
+using equal scales and explicitly omitting heel.
+
 ## 0.7.3 — 2026-11-05
 
 Added a dedicated v5 hydrostatics notebook for the November 5 STEP and component

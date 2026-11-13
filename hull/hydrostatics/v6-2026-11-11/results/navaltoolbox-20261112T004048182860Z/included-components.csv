@@ -1,0 +1,8 @@
+csv_line,component_id,label,mass_lbs,cg_x_in,cg_y_in,cg_z_in,source,notes
+2,printed_shell,Printed hull shell (CSV line 2),25.0,0.0,31.197,4.624,cad,Include integral printed hardpoints
+8,battery_1,Battery 1 (CSV line 8),30.865,0.0,6.4,6.1,cad,Confirm battery count and v6 component CG
+9,battery_2,Battery 2 (CSV line 9),30.865,0.0,18.195,6.098,cad,Confirm battery count and v6 component CG
+10,battery_3,Battery 3 (CSV line 10),30.865,0.0,30.0,6.1,cad,Confirm battery count and v6 component CG
+11,motor_port,Port motor assembly (CSV line 11),3.0,-5.143,42.033,3.442,cad,Include propeller strut and mounts unless listed separately
+12,motor_starboard,Starboard motor assembly (CSV line 12),3.0,5.143,42.033,3.442,cad,Include propeller strut and mounts unless listed separately
+20,payload_front,Front payload (CSV line 20),30.0,0.337,49.241,5.0,cad,Exclude equipment already listed

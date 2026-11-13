@@ -1,5 +1,7 @@
 # Savitsky hydrodynamics
 
+[November 11 v6 sensitivity setup](v6-2026-11-11/README.md) reuses the v6 hydrostatics STEP and loading. Dimensions are confirmed, the shaft angle is 11°, and the first 0–30 mph sensitivity run is complete.
+
 Open [v4 sensitivity-analysis.ipynb](v4-2026-10-30/sensitivity-analysis.ipynb), edit the controls, and Run All. Your existing scenarios and plotting choices are retained. [Boat inputs](v4-2026-10-30/savitsky-inputs.json) · [saved results](v4-2026-10-30/results/RESULTS.md).
 
 - `engine/`: original Python equation notebook and JavaScript calculator; the equation notebook retains its October 21 baseline for regression checks.

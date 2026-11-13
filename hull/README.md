@@ -1,5 +1,9 @@
 # Hull work
 
+[November 11 v6 Savitsky sensitivity notebook](hydrodynamics-savitsky/v6-2026-11-11/README.md) reuses hydrostatics geometry and loading; confirmed dimensions and 11° shaft angle; first sensitivity study complete.
+
+[v6 hydrostatics setup](hydrostatics/v6-2026-11-11/README.md) reuses the v5 workflow with the supplied v6 geometry and a completed 153.595 lb partial-loading run.
+
 [v5 hydrostatics notebook and results](hydrostatics/v5-2026-11-05/README.md) use the new STEP and the 148.595 lb supplied-row loading. The v4 entry points below remain available for comparison.
 
 | Analysis | Current v4 entry point | Older work |

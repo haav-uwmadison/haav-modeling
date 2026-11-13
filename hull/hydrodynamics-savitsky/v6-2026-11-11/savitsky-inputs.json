@@ -1,0 +1,137 @@
+{
+  "description": "November 11 v6 hull and supplied hydrostatics loading; user-confirmed dimensions and 11-degree shaft angle. Equivalent-V estimates only.",
+  "inputs": {
+    "length_m": 1.8288,
+    "beam_m": 0.4064,
+    "mass_kg": 69.66952007015,
+    "deadrise_deg": 15.00000000000005,
+    "lcg_m": 0.6936323639766919,
+    "vcg_m": 0.14073311083043064,
+    "thrust_height_m": -0.0328240561840604,
+    "thrust_x_m": -0.12252673981613506,
+    "thrust_angle_deg": 11,
+    "density_kg_m3": 998.2,
+    "viscosity_m2_s": 1.004e-06,
+    "roughness_m": 0,
+    "wetted_lengths_type": 2,
+    "flap_chord_m": 0,
+    "flap_span_ratio": 0,
+    "flap_angle_deg": 0
+  },
+  "input_notes": {
+    "length_m": {
+      "unit": "m",
+      "meaning": "72 in external overall length from the v6 hydrostatics geometry."
+    },
+    "beam_m": {
+      "unit": "m",
+      "meaning": "16 in outer transom chine beam, including reverse-chine strips; not the 20.341 in overall width."
+    },
+    "mass_kg": {
+      "unit": "kg",
+      "meaning": "153.595 lb from the same v6 hydrostatics CSV; blank masses excluded as authorized."
+    },
+    "deadrise_deg": {
+      "unit": "deg",
+      "meaning": "15-degree main panel at transom, constant-V approximation; compare the 12.608842-degree outer-chine chord."
+    },
+    "lcg_m": {
+      "unit": "m",
+      "meaning": "27.30836079 in forward of transom, mass-weighted from v6 loading."
+    },
+    "vcg_m": {
+      "unit": "m",
+      "meaning": "5.54067365 in above aft keel, mass-weighted from v6 loading."
+    },
+    "thrust_height_m": {
+      "unit": "m",
+      "meaning": "Point on shaft line, above keel; negative = below datum"
+    },
+    "thrust_x_m": {
+      "unit": "m",
+      "meaning": "Point on shaft line, forward of transom; negative = aft"
+    },
+    "thrust_angle_deg": {
+      "unit": "deg",
+      "meaning": "Upward forward thrust angle relative to keel"
+    },
+    "density_kg_m3": {
+      "unit": "kg/m\u00b3",
+      "meaning": "Freshwater at 20 \u00b0C"
+    },
+    "viscosity_m2_s": {
+      "unit": "m\u00b2/s",
+      "meaning": "Freshwater kinematic viscosity at 20 \u00b0C"
+    },
+    "roughness_m": {
+      "unit": "m",
+      "meaning": "Zero = smooth-hull assumption, disables roughness allowance"
+    },
+    "wetted_lengths_type": {
+      "unit": "code",
+      "meaning": "2 = Savitsky 1964; this notebook supports only this geometry"
+    },
+    "flap_chord_m": {
+      "unit": "m",
+      "meaning": "Zero; this notebook supports no flap"
+    },
+    "flap_span_ratio": {
+      "unit": "1",
+      "meaning": "Zero; this notebook supports no flap"
+    },
+    "flap_angle_deg": {
+      "unit": "deg",
+      "meaning": "Zero; this notebook supports no flap"
+    }
+  },
+  "uniform_aft_length_m": null,
+  "propeller_count": 2,
+  "comparison_deadrise_deg": 12.608842432231205,
+  "geometry_warning": "v6 reverse chines and forward keel rocker; no uniform aft length assigned. Constant-V equivalent-hull estimate only.",
+  "geometry_source": {
+    "path": "hull/hydrostatics/v6-2026-11-11/hull 11-11-26.step",
+    "sha256": "d474db2d427a08451baf3d429c8cdc7846aa81098783ee0c12624f73d6a209f0"
+  },
+  "loading_source": {
+    "path": "hull/hydrostatics/v6-2026-11-11/component-masses.csv",
+    "sha256": "903077ddef0a66efec0fc58d44d6afa577c24eac3c1720bce535b750e9d6dcda",
+    "excluded_blank_rows": [
+      "glass_resin_finish",
+      "tube_port",
+      "tube_starboard",
+      "backbone",
+      "baseboard",
+      "esc_port",
+      "esc_starboard",
+      "electronics_enclosure",
+      "electronics",
+      "sensor_tower",
+      "wiring",
+      "fasteners_adhesives",
+      "payload_aft"
+    ]
+  },
+  "assumptions": [
+    "User-confirmed outer transom chine beam b=16 in and main V deadrise 15 deg.",
+    "Outer-chine chord 12.608842 deg is a comparison approximation; reverse-chine strips are not explicitly modeled.",
+    "Same v6 STEP source and component-masses.csv as hydrostatics, referenced directly with hashes; no duplicate geometry.",
+    "Raw STEP rim face is invalid, but reviewed exterior faces used for measurements are valid; see hydrostatics geometry report.",
+    "Forward keel rocker is present. No uniform aft length assigned; all solved points retain equivalent-hull geometry flags.",
+    "Partial loading: seven filled components only; thirteen missing weights excluded as authorized by the user.",
+    "Symmetric model ignores the small transverse CG offset; static trim/heel are not imposed as running trim.",
+    "User-confirmed thrust setup: 2 props, 11 deg shaft/thrust angle, reused v4 point 4.824 in aft and 1.292 in below aft keel.",
+    "Motor component CGs are not shaft thrust-line coordinates.",
+    "Freshwater at 20 C: density 998.2 kg/m3, viscosity 1.004e-6 m2/s; smooth hull and no flap.",
+    "Effective power is horizontal resistance times speed, not motor or battery power.",
+    "No displacement/transition resistance, appendages, air drag, waves, propeller interaction or dynamic-stability model.",
+    "Cv<1 is an evaluation cutoff, not planing onset."
+  ],
+  "geometry_review_source": {
+    "path": "hull/hydrodynamics-savitsky/v6-2026-11-11/geometry-review.json"
+  },
+  "review": {
+    "dimensions_confirmed": true,
+    "thrust_setup_confirmed": true,
+    "notes": "User confirmed measured dimensions and proposed reused two-prop thrust-line point, correcting shaft/thrust angle to 11 degrees."
+  }
+}
