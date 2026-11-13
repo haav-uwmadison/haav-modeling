@@ -35,5 +35,14 @@ runs/
 # Isolated hydrostatics dependency environment
 /hull/hydrostatics/.venv/
 
-# CFD work is kept locally and excluded from publication
-/hull/hydrodynamics-cfd/
+# CFD: only the lightweight v6 case setup, scripts, notebook and summary results are
+# published. Heavy solver output (animation surfaces ~1 GB, solver log, 3D fields) stays
+# local/on the server; regenerate with sync_results.sh. v4 and legacy CFD stay local.
+/hull/hydrodynamics-cfd/*
+!/hull/hydrodynamics-cfd/README.md
+!/hull/hydrodynamics-cfd/v6-2026-11-11/
+/hull/hydrodynamics-cfd/v6-2026-11-11/results-ramp20/postProcessing/animation/
+/hull/hydrodynamics-cfd/v6-2026-11-11/results-ramp20/animation/
+/hull/hydrodynamics-cfd/v6-2026-11-11/results-ramp20/case/
+/hull/hydrodynamics-cfd/v6-2026-11-11/results-ramp20/log.foamRun
+/hull/hydrodynamics-cfd/v6-2026-11-11/results-ramp20/view-*.html

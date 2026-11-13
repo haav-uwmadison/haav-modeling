@@ -1,0 +1,96 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      functions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "$FOAM_CASE/constant/bodyProperties"
+
+forces
+{
+    type            forces;
+    libs            ("libforces.so");
+    patches         (hull);
+    log             on;
+    writeControl    timeStep;
+    writeInterval   1;
+    CofR            $bodyCentre;  // half model: double forces and moments
+}
+
+rigidBodyState
+{
+    type           rigidBodyState;
+    libs           ("librigidBodyState.so");
+    angleUnits     [deg];
+    angularVelocityUnits [deg/s];
+}
+
+// Far-field water level for the watchdog (3.5 m off the centreline, upstream and downstream)
+waterLevel
+{
+    type            sets;
+    libs            ("libsampling.so");
+    writeControl    adjustableRunTime;
+    writeInterval   0.1;
+    interpolationScheme cellPoint;
+    setFormat       raw;
+    fields          (alpha.water);
+    sets
+    {
+        upstream
+        {
+            type    lineUniform;
+            axis    z;
+            start   (3 -3.5 -0.3);
+            end     (3 -3.5 0.8);
+            nPoints 221;
+        }
+        downstream
+        {
+            type    lineUniform;
+            axis    z;
+            start   (-6 -3.5 -0.3);
+            end     (-6 -3.5 0.8);
+            nPoints 221;
+        }
+    }
+}
+
+animation
+{
+    type            surfaces;
+    libs            ("libsampling.so");
+    writeControl    adjustableRunTime;
+    writeInterval   0.05;
+    surfaceFormat   vtk;
+    interpolationScheme cellPoint;
+    fields          (alpha.water p_rgh U);
+    surfaces
+    (
+        freeSurface
+        {
+            type        isoSurface;
+            isoField    alpha.water;
+            isoValue    0.5;
+            interpolate true;
+        }
+        hull
+        {
+            type        patch;
+            patches     (hull);
+            interpolate true;
+        }
+    );
+}
+
+// ************************************************************************* //

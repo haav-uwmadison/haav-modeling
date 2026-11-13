@@ -1,0 +1,7 @@
+# Packages for visualize.ipynb, installed into the Python 3.13 kernel:
+#   /Library/Frameworks/Python.framework/Versions/3.13/bin/python3 -m pip install -r requirements-viz.txt
+numpy>=1.26
+matplotlib>=3.8
+pyvista[jupyter]>=0.44
+imageio>=2.34
+imageio-ffmpeg>=0.5

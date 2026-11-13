@@ -1,0 +1,8 @@
+#!/bin/sh
+# Short test: first 1 s of the schedule (boat effectively at rest). Uses the existing mesh.
+cd "${0%/*}" || exit 1
+. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+foamDictionary -entry endTime -set 1 system/controlDict
+rm -rf processor*/0
+runApplication -a decomposePar -fields -copyZero
+runParallel foamRun

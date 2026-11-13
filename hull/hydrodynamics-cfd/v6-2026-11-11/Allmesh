@@ -1,0 +1,17 @@
+#!/bin/sh
+# v6 hull sample mesh (OpenFOAM 14, based on incompressibleVoF/planingHullW3 mesh 1)
+cd "${0%/*}" || exit 1
+. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+
+# Rotate the hull 1.807 deg bow up about the transom keel: the v6 static rest trim
+# (aft draft 0.1608 m, NavalToolbox 153.595 lb run). Water starts at z = 0.1608 m.
+runApplication surfaceTransformPoints "Ry=-1.807" \
+    constant/geometry/hull_orig.stl constant/geometry/hull.stl
+
+runApplication surfaceFeatures
+runApplication blockMesh
+runApplication decomposePar -noFields
+runParallel refineMesh -dict system/refineMeshDict -overwrite
+runParallel snappyHexMesh -overwrite
+runParallel renumberMesh -noFields -overwrite
+runParallel checkMesh
