@@ -1,11 +1,6 @@
 # CFD — hull resistance
 
-OpenFOAM v2606, installed natively on Apple Silicon:
-
-```bash
-brew install --cask gerlero/openfoam/openfoam
-of() { /Applications/OpenFOAM-v2606.app/Contents/Resources/etc/openfoam -c "$@"; }
-```
+OpenFOAM v2606 is the cfd solver
 
 ## Geometry
 
