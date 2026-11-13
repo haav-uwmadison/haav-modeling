@@ -2,6 +2,9 @@
 
 OpenFOAM v2606 is the cfd solver
 
+# HOW TO RUN AND SEE THE RESULTS:
+in the most recent cfd results you can run the visualize.ipynb to see some of the graphs and stuff and some html viewers, you can also run viewer.py to get a 3d pannable video of step by step.
+
 ## Geometry
 
 `legacy-parametric/export_surfaces.py` runs `hull.py` and writes `legacy-parametric/geometry/*.stl` in OpenFOAM
