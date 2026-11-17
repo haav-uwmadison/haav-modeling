@@ -1,0 +1,16 @@
+{
+  "source": "Savitsky (1964), Hydrodynamic Design of Planing Hulls, Figure 18, printed page 92 (PDF page 22)",
+  "pdf": "references/savitsky-1964-reference-2026-10-28/Savitsky-1964.pdf",
+  "pdf_sha256": "7e862071f7ea03acfbff7d68f24e7152f2e5e0cd3f7bf8243e47607dad9ae9b2",
+  "doi": "10.5957/mt1.1964.1.4.71",
+  "method": "Approximate manual readings of the scanned curves, rounded to 0.1 degree. Piecewise linear interpolation in chart coordinate and then deadrise. No extrapolation.",
+  "reading_tolerance_deg": 0.2,
+  "scope": "Prismatic planing hull empirical onset boundary; reverse chines and rocker are not resolved. A positive margin is not validation of dynamic stability.",
+  "axis": "sqrt(C_L / 2), using actual deadrise-surface lift coefficient, not equivalent flat-plate C_L0",
+  "x": [0.135, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3],
+  "curves_deg": {
+    "0": [1.4, 1.8, 2.7, 3.8, 5.1, 6.4, 7.8, 9.3],
+    "10": [2.9, 3.2, 4.0, 5.0, 6.1, 7.2, 8.4, 9.7],
+    "20": [3.6, 4.0, 4.8, 5.8, 6.9, 8.0, 9.2, 10.5]
+  }
+}

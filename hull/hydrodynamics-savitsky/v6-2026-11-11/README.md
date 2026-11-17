@@ -47,3 +47,21 @@ Use the existing hydrostatics Python environment, or install the [Savitsky noteb
 The default speed grid is 0–30 mph in 1-mph steps. Editable controls compare beam, mass, longitudinal/vertical CG, deadrise and thrust angle, plus the outer-chine-chord approximation and two CG scenarios. Empty a variation list to disable it. Length and thrust-position controls remain available. Charts show resistance, effective power, running trim, wetting, pressure/friction resistance and normalized sensitivity, with model-status flags and exact-value tables.
 
 Each export uses a new timestamped folder under `results/sensitivity/`, saving `study.json`, inch-based `curves.csv`, `sensitivities.csv` and displayed PNG charts. Existing results are preserved. Set `EXPORT_NAME = None` to disable export. Changing the hydrostatics STEP or loading requires refreshing the measurements/baseline before running.
+
+## Porpoising chart
+
+Section 4 overlays the baseline and the comparisons selected by `PLOT_PARAMETER`
+on approximate readings of Savitsky 1964 Figure 18. It also plots limiting trim
+minus running trim against speed, using each case's own deadrise. Positive margin
+is below the empirical boundary. Baseline speed labels are shown every 5 mph.
+
+![Porpoising chart with current mass comparisons](results/porpoising.png)
+
+The reference readings and provenance are in
+[`engine/porpoising-1964.json`](../engine/porpoising-1964.json). Limits are interpolated
+only over the traced horizontal range 0.135–0.30 and deadrise 0°–20°. The plotted
+±0.2° margin band is a reading aid, not a validated uncertainty bound. Unsupported
+points remain unassessed; they are not classified as stable or unstable.
+Exports include `porpoising_x`, `porpoising_limit_deg`, `porpoising_margin_deg`,
+`porpoising_status`, and reference metadata. This screen does not resolve the
+v6 reverse chines/rocker or simulate oscillations.

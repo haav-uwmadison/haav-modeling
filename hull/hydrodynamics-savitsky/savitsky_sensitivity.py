@@ -17,6 +17,131 @@ NOTEBOOK = ROOT / 'hull/hydrodynamics-savitsky/engine/current-hull.ipynb'
 DEFAULT_INPUTS = ROOT / 'hull/hydrodynamics-savitsky/engine/current-hull-inputs.json'
 FUNCTIONS = ('validate', 'geometry_and_lift', 'forces', 'vertical_balance', 'solve', 'run_sweep')
 MPH_TO_M_S = 0.44704
+PORPOISING_FILE = Path(__file__).parent / 'engine/porpoising-1964.json'
+
+
+def porpoising_reference():
+    """Approximate Figure 18 readings with provenance, not an analytic fit."""
+    return json.loads(PORPOISING_FILE.read_text())
+
+
+def porpoising_limit(x, deadrise_deg, reference=None):
+    """Interpolate critical trim in degrees; return None outside traced data."""
+    ref = reference if reference is not None else porpoising_reference()
+    grid = ref['x']
+    betas = sorted(float(b) for b in ref['curves_deg'])
+    if (not all(isinstance(v, (int, float)) and math.isfinite(v)
+                for v in (x, deadrise_deg)) or
+            not grid[0] <= x <= grid[-1] or
+            not betas[0] <= deadrise_deg <= betas[-1]):
+        return None
+
+    def interpolate(value, coordinates, values):
+        for i in range(1, len(coordinates)):
+            if value <= coordinates[i]:
+                fraction = (value - coordinates[i-1]) / (coordinates[i] - coordinates[i-1])
+                return values[i-1] + fraction * (values[i] - values[i-1])
+        return values[-1]
+
+    limits = [interpolate(x, grid, ref['curves_deg'][f'{beta:g}']) for beta in betas]
+    return interpolate(deadrise_deg, betas, limits)
+
+
+def porpoising_point(row, reference=None):
+    """Screen one SI solver row without altering the equilibrium solution.
+
+    Use the solved hull lift (cl_deadrise), which accounts for vertical thrust.
+    Unsolved/outside-screen rows and untraced chart coordinates are not classified.
+    The near-boundary band is a reading aid, not a validated uncertainty interval.
+    """
+    ref = reference if reference is not None else porpoising_reference()
+    result = dict(porpoising_x=None, porpoising_limit_deg=None,
+                  porpoising_margin_deg=None, porpoising_status='not_solved')
+    cl = row.get('cl_deadrise')
+    if (not row.get('solved') or not isinstance(cl, (int, float)) or
+            not math.isfinite(cl) or cl < 0):
+        return result
+    x = math.sqrt(cl / 2)
+    result['porpoising_x'] = x
+    beta = row.get('input__deadrise_deg')
+    limit = porpoising_limit(x, beta, ref)
+    result['porpoising_limit_deg'] = limit
+    if not row.get('screen_ok'):
+        result['porpoising_status'] = 'outside_empirical_screen'
+    elif not isinstance(beta, (int, float)) or not math.isfinite(beta) or not 0 <= beta <= 20:
+        result['porpoising_status'] = 'outside_deadrise_range'
+    elif limit is None:
+        result['porpoising_status'] = 'outside_chart_range'
+    else:
+        margin = limit - row['trim_deg']
+        result['porpoising_margin_deg'] = margin
+        result['porpoising_status'] = ('near_boundary' if abs(margin) <= ref['reading_tolerance_deg']
+                                       else 'below_boundary' if margin > 0 else 'above_boundary')
+    return result
+
+
+def plot_porpoising(rows, *, labels=None, colors=None, baseline_deadrise_deg=15):
+    """Return Figure 18 overlay and speed-margin plot for selected SI study rows.
+
+    Matplotlib is imported only for plotting. Dashed operating paths mark solver
+    points outside its empirical screen. Margin gaps mean no supported estimate.
+    """
+    import matplotlib.pyplot as plt
+    ref = porpoising_reference()
+    labels, colors = labels or {}, colors or {}
+    fig, (chart, margins) = plt.subplots(1, 2, figsize=(14, 5.5), constrained_layout=True)
+    grid = ref['x']
+    for beta, values in ref['curves_deg'].items():
+        chart.plot(grid, values, color='0.5', linewidth=1.2)
+        chart.annotate(f'{beta}°', (grid[-1], values[-1]), xytext=(5, 0),
+                       textcoords='offset points', fontsize=9, color='0.4')
+    limits = [porpoising_limit(x, baseline_deadrise_deg, ref) for x in grid]
+    if all(v is not None for v in limits):
+        chart.plot(grid, limits, '--', color='#b05a00', linewidth=2,
+                   label=f'{baseline_deadrise_deg:g}° boundary (interpolated)')
+    groups = {}
+    for row in rows:
+        groups.setdefault(row['scenario'], []).append({**row, **porpoising_point(row, ref)})
+    for name, points in groups.items():
+        points.sort(key=lambda r: r['speed_mph'])
+        label = labels.get(name, name)
+        color = colors.get(name, 'black' if name == 'baseline' else None)
+        width = 2.5 if name == 'baseline' else 1.2
+        # NaNs preserve gaps: never join across missing/unsupported speed points.
+        path = [r['porpoising_x'] if r['porpoising_x'] is not None and
+                grid[0] <= r['porpoising_x'] <= grid[-1] else math.nan for r in points]
+        trim = [r.get('trim_deg', math.nan) if r.get('screen_ok') else math.nan for r in points]
+        line, = chart.plot(path, trim, color=color, linewidth=width, label=label)
+        color = line.get_color()
+        chart.plot(path, [r.get('trim_deg', math.nan) if not r.get('screen_ok') else math.nan
+                          for r in points], '--', color=color, alpha=.5)
+        margins.plot([r['speed_mph'] for r in points],
+                     [r['porpoising_margin_deg'] if r['porpoising_margin_deg'] is not None
+                      else math.nan for r in points], color=color, linewidth=width, label=label)
+        if name == 'baseline':
+            for row, x in zip(points, path):
+                if math.isfinite(x) and row.get('screen_ok') and row['speed_mph'] % 5 == 0:
+                    chart.scatter([x], [row['trim_deg']], color=color, s=22, zorder=5)
+                    chart.annotate(f"{row['speed_mph']:g} mph", (x, row['trim_deg']),
+                                   xytext=(6, -15), textcoords='offset points', fontsize=8)
+    chart.set(xlim=(.10, .35), ylim=(0, 12), xlabel=r'$\sqrt{C_L/2}$',
+              ylabel='Running trim / limiting trim (deg)', title='Savitsky 1964 · Figure 18')
+    chart.text(.105, 11.5, 'Above your deadrise boundary: porpoising predicted', fontsize=8)
+    chart.text(.105, .35, 'Below your deadrise boundary: stable side of empirical limit', fontsize=8)
+    margins.axhline(0, color='0.4', linewidth=1)
+    margins.axhspan(-ref['reading_tolerance_deg'], ref['reading_tolerance_deg'],
+                    color='#b05a00', alpha=.1)
+    margins.set(xlabel='Speed (mph)', ylabel='Limiting trim − running trim (deg)',
+                title='Trim margin · positive is below boundary')
+    margins.margins(y=.18)
+    margins.text(.02, .98, 'Gaps: unsolved, outside solver screen, or outside traced chart/deadrise range.\n'
+                 'Each variant uses its own deadrise boundary.', transform=margins.transAxes,
+                 va='top', fontsize=8)
+    for ax in (chart, margins):
+        ax.grid(alpha=.2)
+    chart.legend(fontsize=8, loc='upper left', bbox_to_anchor=(0, .91))
+    fig.suptitle('Approximate chart readings · prismatic hull screen; reverse chines / rocker unresolved', fontsize=11)
+    return fig
 
 
 def load_engine():
@@ -142,6 +267,7 @@ def study(config, speeds_mph, variations, scenarios=None, require_uniform_aft=Fa
     if len({name for name, *_ in choices}) != len(choices):
         raise ValueError('Scenario labels must be unique; use less closely spaced values.')
     rows = []
+    porpoising_ref = porpoising_reference()
     for name, key, value, q in choices:
         result = run_curves(engine, q, speeds, config)
         for row in result:
@@ -152,6 +278,7 @@ def study(config, speeds_mph, variations, scenarios=None, require_uniform_aft=Fa
                        screen_ok=solved and row['status'] == 'within_screen',
                        geometry_ok=solved and not row['forebody_approximation'])
             row.update({f'input__{k}': v for k, v in q.items()})
+            row.update(porpoising_point(row, porpoising_ref))
             rows.append(row)
     baseline = {r['speed_mph']: r for r in rows if r['scenario'] == 'baseline'}
     metrics = ['resistance_n', 'effective_power_kw', 'trim_deg', 'keel_wetted_m',
@@ -193,12 +320,17 @@ def study(config, speeds_mph, variations, scenarios=None, require_uniform_aft=Fa
                 repository_version=(ROOT/'VERSION').read_text().strip(),
                 baseline_config=copy.deepcopy(config), speeds_mph=speeds,
                 variations=copy.deepcopy(variations), scenarios=copy.deepcopy(scenarios or {}),
+                porpoising_reference={**porpoising_ref,
+                    'data_sha256': hashlib.sha256(PORPOISING_FILE.read_bytes()).hexdigest()},
                 require_uniform_aft=require_uniform_aft, results=rows, sensitivities=sensitivity,
                 units={'speed_mph': 'mph', 'speed_m_s': 'm/s', 'resistance_n': 'N',
                        'effective_power_kw': 'kW (effective, not electrical)', 'trim_deg': 'deg',
                        'keel_wetted_m': 'm', 'wetted_area_m2': 'm²', 'reynolds_number': 'dimensionless',
                        'pressure_drag_n': 'N', 'friction_drag_n': 'N', 'thrust_n': 'N (along shafts)',
                        'elasticity': '(fractional output change)/(fractional input change)',
+                       'porpoising_x': 'dimensionless sqrt(C_L/2)',
+                       'porpoising_limit_deg': 'deg (approximate Figure 18 reading)',
+                       'porpoising_margin_deg': 'deg (limit minus running trim)',
                        'slope': 'output SI unit / input SI unit (angles in degrees)'})
 
 

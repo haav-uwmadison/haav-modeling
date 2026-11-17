@@ -6,12 +6,38 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from savitsky_sensitivity import ROOT, load_engine, load_baseline, study, export_study
+from savitsky_sensitivity import (ROOT, load_engine, load_baseline, study, export_study,
+                                  porpoising_limit, porpoising_point)
 
 
 class SensitivityTests(unittest.TestCase):
     def setUp(self):
         self.config, _ = load_baseline()
+
+    def test_porpoising_chart_interpolation_and_no_extrapolation(self):
+        # Independent visual checks against the original Figure 18 grid lines.
+        self.assertAlmostEqual(porpoising_limit(.20, 0), 3.8)
+        self.assertAlmostEqual(porpoising_limit(.25, 20), 8.0)
+        self.assertAlmostEqual(porpoising_limit(.20, 15), 5.4)
+        for x, beta in [(.10, 15), (.31, 15), (.2, -1), (.2, 25), (float('nan'), 15)]:
+            self.assertIsNone(porpoising_limit(x, beta))
+
+    def test_porpoising_uses_solved_lift_and_preserves_missing_assessments(self):
+        row = dict(solved=True, screen_ok=True, cl_deadrise=.08,
+                   cl_zero_deadrise=.18, input__deadrise_deg=15, trim_deg=5.0)
+        point = porpoising_point(row)
+        self.assertAlmostEqual(point['porpoising_x'], .2)
+        self.assertAlmostEqual(point['porpoising_margin_deg'], .4)
+        self.assertEqual(point['porpoising_status'], 'below_boundary')
+        self.assertEqual(porpoising_point({**row, 'trim_deg': 6})['porpoising_status'], 'above_boundary')
+        self.assertEqual(porpoising_point({**row, 'trim_deg': 5.4})['porpoising_status'], 'near_boundary')
+        for changes, status in [({'solved': False}, 'not_solved'),
+                                ({'screen_ok': False}, 'outside_empirical_screen'),
+                                ({'cl_deadrise': .5}, 'outside_chart_range'),
+                                ({'input__deadrise_deg': 25}, 'outside_deadrise_range')]:
+            result = porpoising_point({**row, **changes})
+            self.assertEqual(result['porpoising_status'], status)
+            self.assertIsNone(result['porpoising_margin_deg'])
 
     def test_original_engine_matches_all_saved_points(self):
         saved = json.loads((ROOT/'hull/hydrodynamics-savitsky/legacy-2026-10-21/results/results.json').read_text())
@@ -57,7 +83,11 @@ class SensitivityTests(unittest.TestCase):
                 rows = list(csv.DictReader(f))
             self.assertEqual(len(rows), 6)
             self.assertEqual(next(r for r in rows if r['speed_mph'] == '2')['resistance_n'], '')
-            self.assertEqual(len(json.loads((folder/'study.json').read_text())['sensitivities']), 30)
+            self.assertEqual(next(r for r in rows if r['speed_mph'] == '2')['porpoising_margin_deg'], '')
+            saved = json.loads((folder/'study.json').read_text())
+            self.assertEqual(len(saved['sensitivities']), 30)
+            self.assertIn('data_sha256', saved['porpoising_reference'])
+            self.assertTrue(all('porpoising_status' in r for r in saved['results']))
             with self.assertRaises(FileExistsError):
                 export_study(run, folder)
 

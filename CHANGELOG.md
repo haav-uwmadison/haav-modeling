@@ -4,6 +4,15 @@ See [`VERSIONING.md`](VERSIONING.md) for how this file and `VERSION` are kept. T
 of [`MarMar888/hav`](https://github.com/MarMar888/hav)'s `optimization/` folder with its full history
 (MarMar888/hav#98) and keeps the same version line.
 
+## 0.7.7 — 2026-11-17
+
+Added an approximate Savitsky Figure 18 porpoising screen to sensitivity studies
+and section 4 of the current v6 notebook. The chart overlays selected operating
+curves, labels baseline speeds, and shows trim margin against each case's own
+deadrise boundary. Manual chart readings and interpolation provenance are saved
+with exports; unsupported chart/deadrise ranges and solver points remain unassessed.
+Equilibrium equations and existing hull geometry flags are unchanged.
+
 ## 0.7.5 — 2026-11-11
 
 Added a November 11 v6 Savitsky sensitivity notebook reusing the existing engine,
