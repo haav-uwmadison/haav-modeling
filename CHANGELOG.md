@@ -4,6 +4,65 @@ See [`VERSIONING.md`](VERSIONING.md) for how this file and `VERSION` are kept. T
 of [`MarMar888/hav`](https://github.com/MarMar888/hav)'s `optimization/` folder with its full history
 (MarMar888/hav#98) and keeps the same version line.
 
+## 0.7.15 — 2026-11-20
+
+Filled the cooling model with explicit trial assumptions for the selected SSS
+56154-V2 10Y motor and two ESCs. Added low/baseline/high heat cases varying motor
+current, resistance correction, other losses, ESC current, and efficiency across
+the temperature-rise sweep. Flags energy-inconsistent cases and suppresses their
+flow results; scenario values are not presented as ratings or confidence bounds.
+
+## 0.7.14 — 2026-11-20
+
+Added two SEAKING 200A HV V4 ESCs to the cooling estimate using explicit DC input
+voltage/current, operating efficiency, and heat fraction to water. The 5–40°F
+sensitivity now reports motor, ESC, and combined flow contributions in US gpm.
+ESC efficiency and operating inputs remain unset because the listing omits them.
+
+## 0.7.13 — 2026-11-20
+
+Simplified the cooling notebook to one input cell and one calculation cell with
+short explanations. Retains the conservative wye/per-winding copper-loss case,
+explicit unknown thermal inputs, and the 5–40°F sensitivity in US gpm; resistance
+is entered directly from the catalog instead of using automatic motor selection.
+
+## 0.7.12 — 2026-11-20
+
+Added a water-temperature-rise sensitivity from 5°F to 40°F in 5°F increments,
+converting temperature differences to kelvin and reporting required US gpm and
+L/min. The sweep uses the selected heat-load method independently of the optional
+single-point rise and keeps missing thermal inputs unset.
+
+## 0.7.11 — 2026-11-20
+
+Extended the water-cooling notebook with catalog motor selection and motor copper-loss
+estimates comparing per-winding and terminal resistance for wye and delta connections.
+Selects the largest supported resistance case and requires explicit current, hot
+resistance correction, other losses, motor count, and water heat allocation before
+estimating flow. Pump-rating entries require installed-flow confirmation for comparison.
+
+## 0.7.10 — 2026-11-20
+
+Added an initial water-cooling heat-balance notebook with explicit, unset thermal
+inputs and required flow in US gallons per minute. Includes a sourced SEAFLO pump
+rating screen and an optional comparison against confirmed installed flow, without
+assuming motor losses, coolant properties, temperature rise, or circuit losses.
+
+## 0.7.9 — 2026-11-19
+
+Hydrostatics now display signed trim with positive angles meaning bow up, matching
+the planing model. Saved results retain the native bow-down-positive field and add
+a bow-up-positive field. The v6 notebook compares loading CG with the level-hull
+center of buoyancy and refreshes its outputs for the current component weights.
+
+## 0.7.8 — 2026-11-17
+
+The current v6 Savitsky sensitivity notebook now refreshes total mass and CG from
+component-masses.csv before solving, so component weight/position edits do not
+leave stale loading inputs or stop at the old CSV hash. Invalid loading rows still
+fail explicitly, blank masses remain excluded, and saved studies retain their
+original loading. Refreshed the current loading snapshot and notebook charts.
+
 ## 0.7.7 — 2026-11-17
 
 Added an approximate Savitsky Figure 18 porpoising screen to sensitivity studies
@@ -12,6 +71,24 @@ curves, labels baseline speeds, and shows trim margin against each case's own
 deadrise boundary. Manual chart readings and interpolation provenance are saved
 with exports; unsupported chart/deadrise ranges and solver points remain unassessed.
 Equilibrium equations and existing hull geometry flags are unchanged.
+
+## 0.7.6 — 2026-11-16
+
+Added tooling to continue the completed v6 CFD case from its 16-second checkpoint,
+with a five-second ramp from 20 to 30 mph and a three-second hold. The continuation
+copies the decomposed flow, moving mesh and rigid-body state into a separate case,
+updates all three speed schedules, and retains the original run. Preparation and
+launch require the server checkpoint; no new solver results are included.
+Accept both inline input tables and dictionary-style Function1 checkpoint tables.
+The 0–16 s and 16–24 s runs now form one experiment: `sync_results.sh` pulls both into
+`results/` (renamed from `results-ramp20/`), the postprocessing joins restart segments end to
+end, and `visualize.ipynb` plots the full 0–24 s history with both steady holds and the restart marked.
+The notebook also measures wetted surface from every hull frame (total and bottom wetted area,
+keel and chine wetted lengths, λ), cached in `results/wetted.csv`, and compares it with Savitsky.
+Added a v6 roll-test CFD case (`hull/hydrodynamics-cfd/v6-roll-2026-11-18`): full boat at rest with
+heave, roll and pitch free, hit by a 0.5 s, 5 mph side-current pulse and left to rock for 4 s, with a
+roll-limit watchdog and a summary of peak heel, roll period and damping ratio. Its
+`visualize.ipynb` plots the run and `viewer.py` plays it back in 3D.
 
 ## 0.7.5 — 2026-11-11
 
